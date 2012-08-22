@@ -61,484 +61,601 @@
  */
 abstract class BaseiceModelShortUrlQuery extends ModelCriteria
 {
-    
-    /**
-     * Initializes internal state of BaseiceModelShortUrlQuery object.
-     *
-     * @param     string $dbName The dabase name
-     * @param     string $modelName The phpName of a model, e.g. 'Book'
-     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
-     */
-    public function __construct($dbName = 'propel', $modelName = 'iceModelShortUrl', $modelAlias = null)
+  
+  /**
+   * Initializes internal state of BaseiceModelShortUrlQuery object.
+   *
+   * @param     string $dbName The dabase name
+   * @param     string $modelName The phpName of a model, e.g. 'Book'
+   * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
+   */
+  public function __construct($dbName = 'propel', $modelName = 'iceModelShortUrl', $modelAlias = null)
+  {
+    parent::__construct($dbName, $modelName, $modelAlias);
+  }
+
+  /**
+   * Returns a new iceModelShortUrlQuery object.
+   *
+   * @param     string $modelAlias The alias of a model in the query
+   * @param     Criteria $criteria Optional Criteria to build the query from
+   *
+   * @return    iceModelShortUrlQuery
+   */
+  public static function create($modelAlias = null, $criteria = null)
+  {
+    if ($criteria instanceof iceModelShortUrlQuery)
     {
-        parent::__construct($dbName, $modelName, $modelAlias);
+      return $criteria;
     }
-
-    /**
-     * Returns a new iceModelShortUrlQuery object.
-     *
-     * @param     string $modelAlias The alias of a model in the query
-     * @param     Criteria $criteria Optional Criteria to build the query from
-     *
-     * @return    iceModelShortUrlQuery
-     */
-    public static function create($modelAlias = null, $criteria = null)
+    $query = new iceModelShortUrlQuery();
+    if (null !== $modelAlias)
     {
-        if ($criteria instanceof iceModelShortUrlQuery) {
-            return $criteria;
-        }
-        $query = new iceModelShortUrlQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
-        if ($criteria instanceof Criteria) {
-            $query->mergeWith($criteria);
-        }
-        return $query;
+      $query->setModelAlias($modelAlias);
     }
-
-    /**
-     * Find object by primary key
-     * Use instance pooling to avoid a database query if the object exists
-     * <code>
-     * $obj  = $c->findPk(12, $con);
-     * </code>
-     * @param     mixed $key Primary key to use for the query
-     * @param     PropelPDO $con an optional connection object
-     *
-     * @return    iceModelShortUrl|array|mixed the result, formatted by the current formatter
-     */
-    public function findPk($key, $con = null)
+    if ($criteria instanceof Criteria)
     {
-        if ((null !== ($obj = iceModelShortUrlPeer::getInstanceFromPool((string) $key))) && $this->getFormatter()->isObjectFormatter()) {
-            // the object is alredy in the instance pool
-            return $obj;
-        } else {
-            // the object has not been requested yet, or the formatter is not an object formatter
-            $criteria = $this->isKeepQuery() ? clone $this : $this;
-            $stmt = $criteria
-                ->filterByPrimaryKey($key)
-                ->getSelectStatement($con);
-            return $criteria->getFormatter()->init($criteria)->formatOne($stmt);
-        }
+      $query->mergeWith($criteria);
     }
+    return $query;
+  }
 
-    /**
-     * Find objects by primary key
-     * <code>
-     * $objs = $c->findPks(array(12, 56, 832), $con);
-     * </code>
-     * @param     array $keys Primary keys to use for the query
-     * @param     PropelPDO $con an optional connection object
-     *
-     * @return    PropelObjectCollection|array|mixed the list of results, formatted by the current formatter
-     */
-    public function findPks($keys, $con = null)
+  /**
+   * Find object by primary key.
+   * Propel uses the instance pool to skip the database if the object exists.
+   * Go fast if the query is untouched.
+   *
+   * <code>
+   * $obj  = $c->findPk(12, $con);
+   * </code>
+   *
+   * @param     mixed $key Primary key to use for the query
+   * @param     PropelPDO $con an optional connection object
+   *
+   * @return    iceModelShortUrl|array|mixed the result, formatted by the current formatter
+   */
+  public function findPk($key, $con = null)
+  {
+    if ($key === null)
     {
-        $criteria = $this->isKeepQuery() ? clone $this : $this;
-        return $this
-            ->filterByPrimaryKeys($keys)
-            ->find($con);
+      return null;
     }
-
-    /**
-     * Filter the query by primary key
-     *
-     * @param     mixed $key Primary key to use for the query
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function filterByPrimaryKey($key)
+    if ((null !== ($obj = iceModelShortUrlPeer::getInstanceFromPool((string) $key))) && !$this->formatter)
     {
-        return $this->addUsingAlias(iceModelShortUrlPeer::ID, $key, Criteria::EQUAL);
+      // the object is alredy in the instance pool
+      return $obj;
     }
-
-    /**
-     * Filter the query by a list of primary keys
-     *
-     * @param     array $keys The list of primary key to use for the query
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function filterByPrimaryKeys($keys)
+    if ($con === null)
     {
-        return $this->addUsingAlias(iceModelShortUrlPeer::ID, $keys, Criteria::IN);
+      $con = Propel::getConnection(iceModelShortUrlPeer::DATABASE_NAME, Propel::CONNECTION_READ);
     }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
-        }
-        return $this->addUsingAlias(iceModelShortUrlPeer::ID, $id, $comparison);
+    $this->basePreSelect($con);
+    if ($this->formatter || $this->modelAlias || $this->with || $this->select
+     || $this->selectColumns || $this->asColumns || $this->selectModifiers
+     || $this->map || $this->having || $this->joins) {
+      return $this->findPkComplex($key, $con);
     }
-
-    /**
-     * Filter the query on the url column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByUrl('fooValue');   // WHERE url = 'fooValue'
-     * $query->filterByUrl('%fooValue%'); // WHERE url LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $url The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function filterByUrl($url = null, $comparison = null)
+    else
     {
-        if (null === $comparison) {
-            if (is_array($url)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $url)) {
-                $url = str_replace('*', '%', $url);
-                $comparison = Criteria::LIKE;
-            }
-        }
-        return $this->addUsingAlias(iceModelShortUrlPeer::URL, $url, $comparison);
+      return $this->findPkSimple($key, $con);
     }
+  }
 
-    /**
-     * Filter the query on the url_decoded column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByUrlDecoded('fooValue');   // WHERE url_decoded = 'fooValue'
-     * $query->filterByUrlDecoded('%fooValue%'); // WHERE url_decoded LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $urlDecoded The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function filterByUrlDecoded($urlDecoded = null, $comparison = null)
+  /**
+   * Find object by primary key using raw SQL to go fast.
+   * Bypass doSelect() and the object formatter by using generated code.
+   *
+   * @param     mixed $key Primary key to use for the query
+   * @param     PropelPDO $con A connection object
+   *
+   * @return    iceModelShortUrl A model object, or null if the key is not found
+   */
+  protected function findPkSimple($key, $con)
+  {
+    $sql = 'SELECT `ID`, `URL`, `URL_DECODED`, `HASH`, `VIEW_COUNT`, `IS_PUBLIC`, `IS_ENABLED`, `CREATED_AT`, `UPDATED_AT` FROM `short_url` WHERE `ID` = :p0';
+    try
     {
-        if (null === $comparison) {
-            if (is_array($urlDecoded)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $urlDecoded)) {
-                $urlDecoded = str_replace('*', '%', $urlDecoded);
-                $comparison = Criteria::LIKE;
-            }
-        }
-        return $this->addUsingAlias(iceModelShortUrlPeer::URL_DECODED, $urlDecoded, $comparison);
+      $stmt = $con->prepare($sql);
+      $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
+      $stmt->execute();
     }
-
-    /**
-     * Filter the query on the hash column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByHash('fooValue');   // WHERE hash = 'fooValue'
-     * $query->filterByHash('%fooValue%'); // WHERE hash LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $hash The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function filterByHash($hash = null, $comparison = null)
+    catch (Exception $e)
     {
-        if (null === $comparison) {
-            if (is_array($hash)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $hash)) {
-                $hash = str_replace('*', '%', $hash);
-                $comparison = Criteria::LIKE;
-            }
-        }
-        return $this->addUsingAlias(iceModelShortUrlPeer::HASH, $hash, $comparison);
+      Propel::log($e->getMessage(), Propel::LOG_ERR);
+      throw new PropelException(sprintf('Unable to execute SELECT statement [%s]', $sql), $e);
     }
-
-    /**
-     * Filter the query on the view_count column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByViewCount(1234); // WHERE view_count = 1234
-     * $query->filterByViewCount(array(12, 34)); // WHERE view_count IN (12, 34)
-     * $query->filterByViewCount(array('min' => 12)); // WHERE view_count > 12
-     * </code>
-     *
-     * @param     mixed $viewCount The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function filterByViewCount($viewCount = null, $comparison = null)
+    $obj = null;
+    if ($row = $stmt->fetch(PDO::FETCH_NUM))
     {
-        if (is_array($viewCount)) {
-            $useMinMax = false;
-            if (isset($viewCount['min'])) {
-                $this->addUsingAlias(iceModelShortUrlPeer::VIEW_COUNT, $viewCount['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($viewCount['max'])) {
-                $this->addUsingAlias(iceModelShortUrlPeer::VIEW_COUNT, $viewCount['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-        return $this->addUsingAlias(iceModelShortUrlPeer::VIEW_COUNT, $viewCount, $comparison);
+      $obj = new iceModelShortUrl();
+      $obj->hydrate($row);
+      iceModelShortUrlPeer::addInstanceToPool($obj, (string) $key);
     }
+    $stmt->closeCursor();
 
-    /**
-     * Filter the query on the is_public column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByIsPublic(true); // WHERE is_public = true
-     * $query->filterByIsPublic('yes'); // WHERE is_public = true
-     * </code>
-     *
-     * @param     boolean|string $isPublic The value to use as filter.
-     *              Non-boolean arguments are converted using the following rules:
-     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function filterByIsPublic($isPublic = null, $comparison = null)
+    return $obj;
+  }
+
+  /**
+   * Find object by primary key.
+   *
+   * @param     mixed $key Primary key to use for the query
+   * @param     PropelPDO $con A connection object
+   *
+   * @return    iceModelShortUrl|array|mixed the result, formatted by the current formatter
+   */
+  protected function findPkComplex($key, $con)
+  {
+    // As the query uses a PK condition, no limit(1) is necessary.
+    $criteria = $this->isKeepQuery() ? clone $this : $this;
+    $stmt = $criteria
+      ->filterByPrimaryKey($key)
+      ->doSelect($con);
+    return $criteria->getFormatter()->init($criteria)->formatOne($stmt);
+  }
+
+  /**
+   * Find objects by primary key
+   * <code>
+   * $objs = $c->findPks(array(12, 56, 832), $con);
+   * </code>
+   * @param     array $keys Primary keys to use for the query
+   * @param     PropelPDO $con an optional connection object
+   *
+   * @return    PropelObjectCollection|array|mixed the list of results, formatted by the current formatter
+   */
+  public function findPks($keys, $con = null)
+  {
+    if ($con === null)
     {
-        if (is_string($isPublic)) {
-            $is_public = in_array(strtolower($isPublic), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
-        }
-        return $this->addUsingAlias(iceModelShortUrlPeer::IS_PUBLIC, $isPublic, $comparison);
+      $con = Propel::getConnection($this->getDbName(), Propel::CONNECTION_READ);
     }
+    $this->basePreSelect($con);
+    $criteria = $this->isKeepQuery() ? clone $this : $this;
+    $stmt = $criteria
+      ->filterByPrimaryKeys($keys)
+      ->doSelect($con);
+    return $criteria->getFormatter()->init($criteria)->format($stmt);
+  }
 
-    /**
-     * Filter the query on the is_enabled column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByIsEnabled(true); // WHERE is_enabled = true
-     * $query->filterByIsEnabled('yes'); // WHERE is_enabled = true
-     * </code>
-     *
-     * @param     boolean|string $isEnabled The value to use as filter.
-     *              Non-boolean arguments are converted using the following rules:
-     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function filterByIsEnabled($isEnabled = null, $comparison = null)
+  /**
+   * Filter the query by primary key
+   *
+   * @param     mixed $key Primary key to use for the query
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function filterByPrimaryKey($key)
+  {
+    return $this->addUsingAlias(iceModelShortUrlPeer::ID, $key, Criteria::EQUAL);
+  }
+
+  /**
+   * Filter the query by a list of primary keys
+   *
+   * @param     array $keys The list of primary key to use for the query
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function filterByPrimaryKeys($keys)
+  {
+    return $this->addUsingAlias(iceModelShortUrlPeer::ID, $keys, Criteria::IN);
+  }
+
+  /**
+   * Filter the query on the id column
+   *
+   * Example usage:
+   * <code>
+   * $query->filterById(1234); // WHERE id = 1234
+   * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+   * $query->filterById(array('min' => 12)); // WHERE id > 12
+   * </code>
+   *
+   * @param     mixed $id The value to use as filter.
+   *              Use scalar values for equality.
+   *              Use array values for in_array() equivalent.
+   *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+   * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function filterById($id = null, $comparison = null)
+  {
+    if (is_array($id) && null === $comparison)
     {
-        if (is_string($isEnabled)) {
-            $is_enabled = in_array(strtolower($isEnabled), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
-        }
-        return $this->addUsingAlias(iceModelShortUrlPeer::IS_ENABLED, $isEnabled, $comparison);
+      $comparison = Criteria::IN;
     }
+    return $this->addUsingAlias(iceModelShortUrlPeer::ID, $id, $comparison);
+  }
 
-    /**
-     * Filter the query on the created_at column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
-     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
-     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
-     * </code>
-     *
-     * @param     mixed $createdAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function filterByCreatedAt($createdAt = null, $comparison = null)
+  /**
+   * Filter the query on the url column
+   *
+   * Example usage:
+   * <code>
+   * $query->filterByUrl('fooValue');   // WHERE url = 'fooValue'
+   * $query->filterByUrl('%fooValue%'); // WHERE url LIKE '%fooValue%'
+   * </code>
+   *
+   * @param     string $url The value to use as filter.
+   *              Accepts wildcards (* and % trigger a LIKE)
+   * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function filterByUrl($url = null, $comparison = null)
+  {
+    if (null === $comparison)
     {
-        if (is_array($createdAt)) {
-            $useMinMax = false;
-            if (isset($createdAt['min'])) {
-                $this->addUsingAlias(iceModelShortUrlPeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($createdAt['max'])) {
-                $this->addUsingAlias(iceModelShortUrlPeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-        return $this->addUsingAlias(iceModelShortUrlPeer::CREATED_AT, $createdAt, $comparison);
+      if (is_array($url))
+      {
+        $comparison = Criteria::IN;
+      }
+      elseif (preg_match('/[\%\*]/', $url))
+      {
+        $url = str_replace('*', '%', $url);
+        $comparison = Criteria::LIKE;
+      }
     }
+    return $this->addUsingAlias(iceModelShortUrlPeer::URL, $url, $comparison);
+  }
 
-    /**
-     * Filter the query on the updated_at column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
-     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
-     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
-     * </code>
-     *
-     * @param     mixed $updatedAt The value to use as filter.
-     *              Values can be integers (unix timestamps), DateTime objects, or strings.
-     *              Empty strings are treated as NULL.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+  /**
+   * Filter the query on the url_decoded column
+   *
+   * Example usage:
+   * <code>
+   * $query->filterByUrlDecoded('fooValue');   // WHERE url_decoded = 'fooValue'
+   * $query->filterByUrlDecoded('%fooValue%'); // WHERE url_decoded LIKE '%fooValue%'
+   * </code>
+   *
+   * @param     string $urlDecoded The value to use as filter.
+   *              Accepts wildcards (* and % trigger a LIKE)
+   * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function filterByUrlDecoded($urlDecoded = null, $comparison = null)
+  {
+    if (null === $comparison)
     {
-        if (is_array($updatedAt)) {
-            $useMinMax = false;
-            if (isset($updatedAt['min'])) {
-                $this->addUsingAlias(iceModelShortUrlPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($updatedAt['max'])) {
-                $this->addUsingAlias(iceModelShortUrlPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-        return $this->addUsingAlias(iceModelShortUrlPeer::UPDATED_AT, $updatedAt, $comparison);
+      if (is_array($urlDecoded))
+      {
+        $comparison = Criteria::IN;
+      }
+      elseif (preg_match('/[\%\*]/', $urlDecoded))
+      {
+        $urlDecoded = str_replace('*', '%', $urlDecoded);
+        $comparison = Criteria::LIKE;
+      }
     }
+    return $this->addUsingAlias(iceModelShortUrlPeer::URL_DECODED, $urlDecoded, $comparison);
+  }
 
-    /**
-     * Filter the query by a related iceModelShortUrlHit object
-     *
-     * @param     iceModelShortUrlHit $iceModelShortUrlHit  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function filterByiceModelShortUrlHit($iceModelShortUrlHit, $comparison = null)
+  /**
+   * Filter the query on the hash column
+   *
+   * Example usage:
+   * <code>
+   * $query->filterByHash('fooValue');   // WHERE hash = 'fooValue'
+   * $query->filterByHash('%fooValue%'); // WHERE hash LIKE '%fooValue%'
+   * </code>
+   *
+   * @param     string $hash The value to use as filter.
+   *              Accepts wildcards (* and % trigger a LIKE)
+   * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function filterByHash($hash = null, $comparison = null)
+  {
+    if (null === $comparison)
     {
-        if ($iceModelShortUrlHit instanceof iceModelShortUrlHit) {
-            return $this
-                ->addUsingAlias(iceModelShortUrlPeer::ID, $iceModelShortUrlHit->getShortUrlId(), $comparison);
-        } elseif ($iceModelShortUrlHit instanceof PropelCollection) {
-            return $this
-                ->useiceModelShortUrlHitQuery()
-                ->filterByPrimaryKeys($iceModelShortUrlHit->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByiceModelShortUrlHit() only accepts arguments of type iceModelShortUrlHit or PropelCollection');
-        }
+      if (is_array($hash))
+      {
+        $comparison = Criteria::IN;
+      }
+      elseif (preg_match('/[\%\*]/', $hash))
+      {
+        $hash = str_replace('*', '%', $hash);
+        $comparison = Criteria::LIKE;
+      }
     }
+    return $this->addUsingAlias(iceModelShortUrlPeer::HASH, $hash, $comparison);
+  }
 
-    /**
-     * Adds a JOIN clause to the query using the iceModelShortUrlHit relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function joiniceModelShortUrlHit($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+  /**
+   * Filter the query on the view_count column
+   *
+   * Example usage:
+   * <code>
+   * $query->filterByViewCount(1234); // WHERE view_count = 1234
+   * $query->filterByViewCount(array(12, 34)); // WHERE view_count IN (12, 34)
+   * $query->filterByViewCount(array('min' => 12)); // WHERE view_count > 12
+   * </code>
+   *
+   * @param     mixed $viewCount The value to use as filter.
+   *              Use scalar values for equality.
+   *              Use array values for in_array() equivalent.
+   *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+   * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function filterByViewCount($viewCount = null, $comparison = null)
+  {
+    if (is_array($viewCount))
     {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('iceModelShortUrlHit');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'iceModelShortUrlHit');
-        }
-
+      $useMinMax = false;
+      if (isset($viewCount['min']))
+      {
+        $this->addUsingAlias(iceModelShortUrlPeer::VIEW_COUNT, $viewCount['min'], Criteria::GREATER_EQUAL);
+        $useMinMax = true;
+      }
+      if (isset($viewCount['max']))
+      {
+        $this->addUsingAlias(iceModelShortUrlPeer::VIEW_COUNT, $viewCount['max'], Criteria::LESS_EQUAL);
+        $useMinMax = true;
+      }
+      if ($useMinMax)
+      {
         return $this;
+      }
+      if (null === $comparison)
+      {
+        $comparison = Criteria::IN;
+      }
     }
+    return $this->addUsingAlias(iceModelShortUrlPeer::VIEW_COUNT, $viewCount, $comparison);
+  }
 
-    /**
-     * Use the iceModelShortUrlHit relation iceModelShortUrlHit object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return    iceModelShortUrlHitQuery A secondary query class using the current class as primary query
-     */
-    public function useiceModelShortUrlHitQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+  /**
+   * Filter the query on the is_public column
+   *
+   * Example usage:
+   * <code>
+   * $query->filterByIsPublic(true); // WHERE is_public = true
+   * $query->filterByIsPublic('yes'); // WHERE is_public = true
+   * </code>
+   *
+   * @param     boolean|string $isPublic The value to use as filter.
+   *              Non-boolean arguments are converted using the following rules:
+   *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+   *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+   *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+   * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function filterByIsPublic($isPublic = null, $comparison = null)
+  {
+    if (is_string($isPublic))
     {
-        return $this
-            ->joiniceModelShortUrlHit($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'iceModelShortUrlHit', 'iceModelShortUrlHitQuery');
+      $is_public = in_array(strtolower($isPublic), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
     }
+    return $this->addUsingAlias(iceModelShortUrlPeer::IS_PUBLIC, $isPublic, $comparison);
+  }
 
-    /**
-     * Exclude object from result
-     *
-     * @param     iceModelShortUrl $iceModelShortUrl Object to remove from the list of results
-     *
-     * @return    iceModelShortUrlQuery The current query, for fluid interface
-     */
-    public function prune($iceModelShortUrl = null)
+  /**
+   * Filter the query on the is_enabled column
+   *
+   * Example usage:
+   * <code>
+   * $query->filterByIsEnabled(true); // WHERE is_enabled = true
+   * $query->filterByIsEnabled('yes'); // WHERE is_enabled = true
+   * </code>
+   *
+   * @param     boolean|string $isEnabled The value to use as filter.
+   *              Non-boolean arguments are converted using the following rules:
+   *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+   *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+   *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+   * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function filterByIsEnabled($isEnabled = null, $comparison = null)
+  {
+    if (is_string($isEnabled))
     {
-        if ($iceModelShortUrl) {
-            $this->addUsingAlias(iceModelShortUrlPeer::ID, $iceModelShortUrl->getId(), Criteria::NOT_EQUAL);
-        }
+      $is_enabled = in_array(strtolower($isEnabled), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+    }
+    return $this->addUsingAlias(iceModelShortUrlPeer::IS_ENABLED, $isEnabled, $comparison);
+  }
 
+  /**
+   * Filter the query on the created_at column
+   *
+   * Example usage:
+   * <code>
+   * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+   * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+   * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+   * </code>
+   *
+   * @param     mixed $createdAt The value to use as filter.
+   *              Values can be integers (unix timestamps), DateTime objects, or strings.
+   *              Empty strings are treated as NULL.
+   *              Use scalar values for equality.
+   *              Use array values for in_array() equivalent.
+   *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+   * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function filterByCreatedAt($createdAt = null, $comparison = null)
+  {
+    if (is_array($createdAt))
+    {
+      $useMinMax = false;
+      if (isset($createdAt['min']))
+      {
+        $this->addUsingAlias(iceModelShortUrlPeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+        $useMinMax = true;
+      }
+      if (isset($createdAt['max']))
+      {
+        $this->addUsingAlias(iceModelShortUrlPeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+        $useMinMax = true;
+      }
+      if ($useMinMax)
+      {
         return $this;
+      }
+      if (null === $comparison)
+      {
+        $comparison = Criteria::IN;
+      }
     }
+    return $this->addUsingAlias(iceModelShortUrlPeer::CREATED_AT, $createdAt, $comparison);
+  }
+
+  /**
+   * Filter the query on the updated_at column
+   *
+   * Example usage:
+   * <code>
+   * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+   * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+   * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+   * </code>
+   *
+   * @param     mixed $updatedAt The value to use as filter.
+   *              Values can be integers (unix timestamps), DateTime objects, or strings.
+   *              Empty strings are treated as NULL.
+   *              Use scalar values for equality.
+   *              Use array values for in_array() equivalent.
+   *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+   * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+  {
+    if (is_array($updatedAt))
+    {
+      $useMinMax = false;
+      if (isset($updatedAt['min']))
+      {
+        $this->addUsingAlias(iceModelShortUrlPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+        $useMinMax = true;
+      }
+      if (isset($updatedAt['max']))
+      {
+        $this->addUsingAlias(iceModelShortUrlPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+        $useMinMax = true;
+      }
+      if ($useMinMax)
+      {
+        return $this;
+      }
+      if (null === $comparison)
+      {
+        $comparison = Criteria::IN;
+      }
+    }
+    return $this->addUsingAlias(iceModelShortUrlPeer::UPDATED_AT, $updatedAt, $comparison);
+  }
+
+  /**
+   * Filter the query by a related iceModelShortUrlHit object
+   *
+   * @param     iceModelShortUrlHit $iceModelShortUrlHit  the related object to use as filter
+   * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function filterByiceModelShortUrlHit($iceModelShortUrlHit, $comparison = null)
+  {
+    if ($iceModelShortUrlHit instanceof iceModelShortUrlHit)
+    {
+      return $this
+        ->addUsingAlias(iceModelShortUrlPeer::ID, $iceModelShortUrlHit->getShortUrlId(), $comparison);
+    }
+    elseif ($iceModelShortUrlHit instanceof PropelCollection)
+    {
+      return $this
+        ->useiceModelShortUrlHitQuery()
+        ->filterByPrimaryKeys($iceModelShortUrlHit->getPrimaryKeys())
+        ->endUse();
+    }
+    else
+    {
+      throw new PropelException('filterByiceModelShortUrlHit() only accepts arguments of type iceModelShortUrlHit or PropelCollection');
+    }
+  }
+
+  /**
+   * Adds a JOIN clause to the query using the iceModelShortUrlHit relation
+   *
+   * @param     string $relationAlias optional alias for the relation
+   * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function joiniceModelShortUrlHit($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+  {
+    $tableMap = $this->getTableMap();
+    $relationMap = $tableMap->getRelation('iceModelShortUrlHit');
+
+    // create a ModelJoin object for this join
+    $join = new ModelJoin();
+    $join->setJoinType($joinType);
+    $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+    if ($previousJoin = $this->getPreviousJoin())
+    {
+      $join->setPreviousJoin($previousJoin);
+    }
+
+    // add the ModelJoin to the current object
+    if($relationAlias)
+    {
+      $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+      $this->addJoinObject($join, $relationAlias);
+    }
+    else
+    {
+      $this->addJoinObject($join, 'iceModelShortUrlHit');
+    }
+
+    return $this;
+  }
+
+  /**
+   * Use the iceModelShortUrlHit relation iceModelShortUrlHit object
+   *
+   * @see       useQuery()
+   *
+   * @param     string $relationAlias optional alias for the relation,
+   *                                   to be used as main alias in the secondary query
+   * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+   *
+   * @return    iceModelShortUrlHitQuery A secondary query class using the current class as primary query
+   */
+  public function useiceModelShortUrlHitQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+  {
+    return $this
+      ->joiniceModelShortUrlHit($relationAlias, $joinType)
+      ->useQuery($relationAlias ? $relationAlias : 'iceModelShortUrlHit', 'iceModelShortUrlHitQuery');
+  }
+
+  /**
+   * Exclude object from result
+   *
+   * @param     iceModelShortUrl $iceModelShortUrl Object to remove from the list of results
+   *
+   * @return    iceModelShortUrlQuery The current query, for fluid interface
+   */
+  public function prune($iceModelShortUrl = null)
+  {
+    if ($iceModelShortUrl)
+    {
+      $this->addUsingAlias(iceModelShortUrlPeer::ID, $iceModelShortUrl->getId(), Criteria::NOT_EQUAL);
+    }
+
+    return $this;
+  }
 
   // timestampable behavior
   

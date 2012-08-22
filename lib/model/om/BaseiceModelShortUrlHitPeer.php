@@ -20,9 +20,6 @@ abstract class BaseiceModelShortUrlHitPeer
   /** the related Propel class for this table */
   const OM_CLASS = 'iceModelShortUrlHit';
 
-  /** A class that can be returned by this peer. */
-  const CLASS_DEFAULT = 'plugins.iceShortUrlPlugin.lib.model.iceModelShortUrlHit';
-
   /** the related TableMap class for this table */
   const TM_CLASS = 'iceModelShortUrlHitTableMap';
 
@@ -464,7 +461,7 @@ abstract class BaseiceModelShortUrlHitPeer
     $results = array();
   
     // set the class once to avoid overhead in the loop
-    $cls = iceModelShortUrlHitPeer::getOMClass(false);
+    $cls = iceModelShortUrlHitPeer::getOMClass();
     // populate the object(s)
     while ($row = $stmt->fetch(PDO::FETCH_NUM))
     {
@@ -625,7 +622,7 @@ abstract class BaseiceModelShortUrlHitPeer
       else
       {
 
-        $cls = iceModelShortUrlHitPeer::getOMClass(false);
+        $cls = iceModelShortUrlHitPeer::getOMClass();
 
         $obj1 = new $cls();
         $obj1->hydrate($row);
@@ -639,7 +636,7 @@ abstract class BaseiceModelShortUrlHitPeer
         if (!$obj2)
         {
 
-          $cls = iceModelShortUrlPeer::getOMClass(false);
+          $cls = iceModelShortUrlPeer::getOMClass();
 
           $obj2 = new $cls();
           $obj2->hydrate($row, $startcol);
@@ -767,7 +764,7 @@ abstract class BaseiceModelShortUrlHitPeer
       }
       else
       {
-        $cls = iceModelShortUrlHitPeer::getOMClass(false);
+        $cls = iceModelShortUrlHitPeer::getOMClass();
 
         $obj1 = new $cls();
         $obj1->hydrate($row);
@@ -783,7 +780,7 @@ abstract class BaseiceModelShortUrlHitPeer
         if (!$obj2)
         {
 
-          $cls = iceModelShortUrlPeer::getOMClass(false);
+          $cls = iceModelShortUrlPeer::getOMClass();
 
           $obj2 = new $cls();
           $obj2->hydrate($row, $startcol2);
@@ -827,17 +824,12 @@ abstract class BaseiceModelShortUrlHitPeer
   /**
    * The class that the Peer will make instances of.
    *
-   * If $withPrefix is true, the returned path
-   * uses a dot-path notation which is tranalted into a path
-   * relative to a location on the PHP include_path.
-   * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
    *
-   * @param      boolean $withPrefix Whether or not to return the path with the class name
-   * @return     string path.to.ClassName
+   * @return     string ClassName
    */
-  public static function getOMClass($withPrefix = true)
+  public static function getOMClass()
   {
-    return $withPrefix ? iceModelShortUrlHitPeer::CLASS_DEFAULT : iceModelShortUrlHitPeer::OM_CLASS;
+    return iceModelShortUrlHitPeer::OM_CLASS;
   }
 
   /**

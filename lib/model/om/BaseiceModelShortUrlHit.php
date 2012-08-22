@@ -25,6 +25,12 @@ abstract class BaseiceModelShortUrlHit extends BaseObject  implements Persistent
   protected static $peer;
 
   /**
+   * The flag var to prevent infinit loop in deep copy
+   * @var       boolean
+   */
+  protected $startCopy = false;
+
+  /**
    * The value for the id field.
    * @var        int
    */
@@ -655,7 +661,7 @@ abstract class BaseiceModelShortUrlHit extends BaseObject  implements Persistent
         $con->commit();
       }
     }
-    catch (PropelException $e)
+    catch (Exception $e)
     {
       $con->rollBack();
       throw $e;
@@ -751,7 +757,7 @@ abstract class BaseiceModelShortUrlHit extends BaseObject  implements Persistent
       $con->commit();
       return $affectedRows;
     }
-    catch (PropelException $e)
+    catch (Exception $e)
     {
       $con->rollBack();
       throw $e;
@@ -790,39 +796,152 @@ abstract class BaseiceModelShortUrlHit extends BaseObject  implements Persistent
         $this->seticeModelShortUrl($this->aiceModelShortUrl);
       }
 
-      if ($this->isNew() )
+      if ($this->isNew() || $this->isModified())
       {
-        $this->modifiedColumns[] = iceModelShortUrlHitPeer::ID;
-      }
-
-      // If this object has been modified, then save it to the database.
-      if ($this->isModified())
-      {
+        // persist changes
         if ($this->isNew())
         {
-          $criteria = $this->buildCriteria();
-          if ($criteria->keyContainsValue(iceModelShortUrlHitPeer::ID) )
-          {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.iceModelShortUrlHitPeer::ID.')');
-          }
-
-          $pk = BasePeer::doInsert($criteria, $con);
-          $affectedRows += 1;
-          $this->setId($pk);  //[IMV] update autoincrement primary key
-          $this->setNew(false);
+          $this->doInsert($con);
         }
         else
         {
-          $affectedRows += iceModelShortUrlHitPeer::doUpdate($this, $con);
+          $this->doUpdate($con);
         }
-
-        $this->resetModified(); // [HL] After being saved an object is no longer 'modified'
+        $affectedRows += 1;
+        $this->resetModified();
       }
 
       $this->alreadyInSave = false;
 
     }
     return $affectedRows;
+  }
+
+  /**
+   * Insert the row in the database.
+   *
+   * @param      PropelPDO $con
+   *
+   * @throws     PropelException
+   * @see        doSave()
+   */
+  protected function doInsert(PropelPDO $con)
+  {
+    $modifiedColumns = array();
+    $index = 0;
+
+    $this->modifiedColumns[] = iceModelShortUrlHitPeer::ID;
+    if (null !== $this->id)
+    {
+      throw new PropelException('Cannot insert a value for auto-increment primary key (' . iceModelShortUrlHitPeer::ID . ')');
+    }
+
+     // check the columns in natural order for more readable SQL queries
+    if ($this->isColumnModified(iceModelShortUrlHitPeer::ID))
+    {
+      $modifiedColumns[':p' . $index++]  = '`ID`';
+    }
+    if ($this->isColumnModified(iceModelShortUrlHitPeer::SHORT_URL_ID))
+    {
+      $modifiedColumns[':p' . $index++]  = '`SHORT_URL_ID`';
+    }
+    if ($this->isColumnModified(iceModelShortUrlHitPeer::SESSION_ID))
+    {
+      $modifiedColumns[':p' . $index++]  = '`SESSION_ID`';
+    }
+    if ($this->isColumnModified(iceModelShortUrlHitPeer::IP_ADDRESS))
+    {
+      $modifiedColumns[':p' . $index++]  = '`IP_ADDRESS`';
+    }
+    if ($this->isColumnModified(iceModelShortUrlHitPeer::REFERRER))
+    {
+      $modifiedColumns[':p' . $index++]  = '`REFERRER`';
+    }
+    if ($this->isColumnModified(iceModelShortUrlHitPeer::IS_MOBILE))
+    {
+      $modifiedColumns[':p' . $index++]  = '`IS_MOBILE`';
+    }
+    if ($this->isColumnModified(iceModelShortUrlHitPeer::CREATED_AT))
+    {
+      $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+    }
+    if ($this->isColumnModified(iceModelShortUrlHitPeer::UPDATED_AT))
+    {
+      $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+    }
+
+    $sql = sprintf(
+      'INSERT INTO `short_url_hit` (%s) VALUES (%s)',
+      implode(', ', $modifiedColumns),
+      implode(', ', array_keys($modifiedColumns))
+    );
+
+    try
+    {
+      $stmt = $con->prepare($sql);
+      foreach ($modifiedColumns as $identifier => $columnName)
+      {
+        switch ($columnName)
+        {
+          case '`ID`':
+            $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+            break;
+          case '`SHORT_URL_ID`':
+            $stmt->bindValue($identifier, $this->short_url_id, PDO::PARAM_INT);
+            break;
+          case '`SESSION_ID`':
+            $stmt->bindValue($identifier, $this->session_id, PDO::PARAM_STR);
+            break;
+          case '`IP_ADDRESS`':
+            $stmt->bindValue($identifier, $this->ip_address, PDO::PARAM_STR);
+            break;
+          case '`REFERRER`':
+            $stmt->bindValue($identifier, $this->referrer, PDO::PARAM_STR);
+            break;
+          case '`IS_MOBILE`':
+            $stmt->bindValue($identifier, (int) $this->is_mobile, PDO::PARAM_INT);
+            break;
+          case '`CREATED_AT`':
+            $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
+            break;
+          case '`UPDATED_AT`':
+            $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
+            break;
+        }
+      }
+      $stmt->execute();
+    }
+    catch (Exception $e)
+    {
+      Propel::log($e->getMessage(), Propel::LOG_ERR);
+      throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), $e);
+    }
+
+    try
+    {
+      $pk = $con->lastInsertId();
+    }
+    catch (Exception $e)
+    {
+      throw new PropelException('Unable to get autoincrement id.', $e);
+    }
+    $this->setId($pk);
+
+    $this->setNew(false);
+  }
+
+  /**
+   * Update the row in the database.
+   *
+   * @param      PropelPDO $con
+   *
+   * @see        doSave()
+   */
+  protected function doUpdate(PropelPDO $con)
+  {
+    $selectCriteria = $this->buildPkeyCriteria();
+    $valuesCriteria = $this->buildCriteria();
+    BasePeer::doUpdate($selectCriteria, $valuesCriteria, $con);
   }
 
   /**
@@ -1188,6 +1307,19 @@ abstract class BaseiceModelShortUrlHit extends BaseObject  implements Persistent
     $copyObj->setIsMobile($this->getIsMobile());
     $copyObj->setCreatedAt($this->getCreatedAt());
     $copyObj->setUpdatedAt($this->getUpdatedAt());
+
+    if ($deepCopy && !$this->startCopy)
+    {
+      // important: temporarily setNew(false) because this affects the behavior of
+      // the getter/setter methods for fkey referrer objects.
+      $copyObj->setNew(false);
+      // store object hash to prevent cycle
+      $this->startCopy = true;
+
+      //unflag object copy
+      $this->startCopy = false;
+    }
+
     if ($makeNew)
     {
       $copyObj->setNew(true);
